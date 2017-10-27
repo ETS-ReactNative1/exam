@@ -1,5 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import Immutable from 'immutable';
+import apiurl from './apiurl';
 
 export const REQUEST_TOKEN = 'REQUEST_TOKEN';
 export const requestToken = () => (
@@ -14,11 +15,12 @@ export const receiveToken = json => (
 export const fetchToken = () => (
   (dispatch) => {
     dispatch(requestToken());
-    return fetch('https://api.vatusa.dev/v2/auth/token', { credentials: 'include' })
+    return fetch(`${apiurl}/v2/auth/token`, { credentials: 'include' })
       .then(response => response.json())
       .then(json => dispatch(receiveToken(Immutable.fromJS(json))));
   }
 );
+
 
 export default function token(state = Immutable.fromJS({ token: '', fetching: false }), action) {
   switch (action.type) {
