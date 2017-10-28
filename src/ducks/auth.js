@@ -4,6 +4,7 @@ import apiurl from './apiurl';
 
 export const REQUEST_TOKEN = 'REQUEST_TOKEN';
 export const RECEIVE_TOKEN = 'RECEIVE_TOKEN';
+export const ERROR_TOKEN = 'ERROR_TOKEN';
 
 export const requestToken = () => (
   { type: REQUEST_TOKEN }
@@ -13,15 +14,27 @@ export const receiveToken = json => (
   { type: RECEIVE_TOKEN, token: json }
 );
 
+export const errorToken = e => (
+  { type: ERROR_TOKEN, message: e }
+);
+
 export const fetchToken = () =>
   (dispatch) => {
     dispatch(requestToken());
     return fetch(`${apiurl}/v2/auth/token`, { credentials: 'include' })
-      .then(response => response.json())
-      .then(json => dispatch(receiveToken(Immutable.fromJS(json))));
+      .then((response) => {
+        if (response.status !== 200) {
+          throw Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then(json => dispatch(receiveToken(Immutable.fromJS(json))))
+      .catch(e => dispatch(errorToken(Immutable.fromJS(e))));
   };
 
-export default function token(state = Immutable.fromJS({ token: '', isAuthenticated: false, isFetching: false }), action) {
+export default function token(state = Immutable.fromJS({
+  token: '', isAuthenticated: false, isFetching: false, hasErrored: false,
+}), action) {
   switch (action.type) {
     case REQUEST_TOKEN: {
       return state.setIn(['isFetching'], true);
@@ -31,6 +44,14 @@ export default function token(state = Immutable.fromJS({ token: '', isAuthentica
       newState = newState.setIn(['isAuthenticated'], true);
       newState = newState.setIn(['token'], action.token);
       localStorage.setItem('token', newState.getIn(['token', 'token']));
+      return newState;
+    }
+    case ERROR_TOKEN: {
+      let newState = state.setIn(['isFetching'], false);
+      newState = newState.setIn(['isAuthenticated'], false);
+      newState = newState.setIn(['token'], '');
+      newState = newState.setIn(['hasErrored'], true);
+      localStorage.removeItem('token');
       return newState;
     }
     default: {

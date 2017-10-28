@@ -29,7 +29,6 @@ export default function exam(state = Immutable.fromJS({
       return state.setIn(['isFetching'], true);
     }
     case RECEIVE_EXAM: {
-      console.dir(action.exam);
       let newState = state.setIn(['isFetching'], false);
       newState = newState.setIn(['hasExam'], true);
       newState = newState.setIn(['payload'], action.exam.get('payload'));

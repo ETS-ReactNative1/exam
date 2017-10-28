@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import { Container, Segment } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 
 import ExamBox from './exambox';
@@ -13,9 +14,13 @@ class Main extends React.Component {
         <Router>
           <div className="container">
             <Header />
-            <Switch>
-              <Route exact path="/" component={ExamBox} />
-            </Switch>
+            <Container style={{ marginTop: '20px' }}>
+              <Segment color="blue">
+                <Switch>
+                  <Route exact path="/" component={ExamBox} />
+                </Switch>
+              </Segment>
+            </Container>
           </div>
         </Router>
       </Provider>
