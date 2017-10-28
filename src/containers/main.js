@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import PropTypes from 'prop-types';
 
+import ExamBox from './exambox';
 import Header from './Header';
 
 class Main extends React.Component {
@@ -13,9 +14,8 @@ class Main extends React.Component {
           <div className="container">
             <Header />
             <Switch>
-              <Route exact path="/" />
+              <Route exact path="/" component={ExamBox} />
             </Switch>
-
           </div>
         </Router>
       </Provider>
