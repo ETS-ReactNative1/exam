@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Icon, Button, Header, Message } from 'semantic-ui-react';
 
 import { fetchToken } from '../ducks/auth';
-import { fetchExam, updateExam } from '../ducks/exam';
+import { fetchExam, updateExam, endExam, beginExam, submitExam } from '../ducks/exam';
 import Intro from './Slides/intro';
 import Question from './Slides/question';
 
@@ -40,16 +40,26 @@ class ExamBox extends Component {
     clearInterval(this.tokenDispatcher);
   }
   nextFunc() {
-    if (this.intro === true) {
-      this.intro = false;
+    if (this.position === this.props.exam.getIn(['exam']).numQuestions - 1 && !this.intro) {
+      // This is where we will handle submission.
+      this.props.dispatchEndExam();
+      this.props.dispatchSubmitExam(
+        this.props.exam.getIn(['payload']),
+        JSON.stringify(this.props.exam.getIn(['answers'])),
+      );
     } else {
-      this.position += 1;
+      if (this.intro === true) {
+        this.intro = false;
+        this.props.dispatchBeginExam();
+      } else {
+        this.position += 1;
+      }
+      this.question = this.props.exam.getIn(['exam']).questions[this.position];
+      let value = this.props.exam.getIn(['answers', this.question.id]);
+      if (value === undefined) value = '';
+      this.setState({ value });
+      this.forceUpdate();
     }
-    this.question = this.props.exam.getIn(['exam']).questions[this.position];
-    let value = this.props.exam.getIn(['answers', this.question.id]);
-    if (value === undefined) value = '';
-    this.setState({ value });
-    this.forceUpdate();
   }
   prevFunc() {
     this.position -= 1;
@@ -57,7 +67,6 @@ class ExamBox extends Component {
     this.question = this.props.exam.getIn(['exam']).questions[this.position];
     let value = this.props.exam.getIn(['answers', this.question.id]);
     if (value === undefined) {
-      console.log("Setting to ''");
       value = '';
     }
     this.setState({ value });
@@ -81,15 +90,15 @@ class ExamBox extends Component {
         </Message>
       );
     }
-    if (this.props.exam.getIn(['hasExam']) !== true) {
+    if (this.props.exam.getIn(['hasExam']) !== true && this.props.exam.getIn(['hasErrored']) !== true) {
       return (<div>Getting exam.</div>);
     }
     if (this.props.exam.getIn(['hasErrored']) === true) {
       return (
         <Message negative>
           <Message.Header><Icon name="warning sign" /> Exam Generation Error</Message.Header>
-          <p>There was an error retrieving the examination from the VATUSA API.  The
-            message we got was {this.props.exam.getIn(['payload'])}
+          <p>There was an error retrieving the examination from the VATUSA API.</p>
+          <p>The message we got was <b>{this.props.exam.getIn(['payload'])}</b>
           </p>
         </Message>
       );
@@ -97,19 +106,29 @@ class ExamBox extends Component {
     if (this.intro) {
       return (<Intro nextFunc={this.nextFunc} />);
     }
-    return (
-      <div>
-        <Header as="h1" color="blue">{this.props.exam.getIn(['exam']).name}</Header>
-        <Question
-          position={this.position}
-          question={this.question}
-          handleChange={this.handleChange}
-          valueState={this.state.value}
-          nextFunc={this.nextFunc}
-          prevFunc={this.prevFunc}
-        />
-      </div>
-    );
+    if (this.props.exam.getIn(['isComplete']) === -1) {
+      return (
+        <div>
+          <Header as="h1" color="blue">{this.props.exam.getIn(['exam']).name}</Header>
+          <Question
+            position={this.position}
+            question={this.question}
+            handleChange={this.handleChange}
+            valueState={this.state.value}
+            nextFunc={this.nextFunc}
+            prevFunc={this.prevFunc}
+            last={this.position === this.props.exam.getIn(['exam']).numQuestions - 1}
+          />
+        </div>
+      );
+    }
+    if (this.props.exam.getIn(['isComplete']) === 0 || this.props.exam.getIn(['isComplete']) === 1) {
+      return (<div>Submitting exam... Please wait.</div>);
+    }
+    if (this.props.exam.getIn(['isComplete']) === 2) {
+      return (<div>Done.</div>);
+    }
+    return (<div>Unknown location!!!</div>);
   }
 }
 
@@ -121,6 +140,9 @@ const mapDispatchToProps = dispatch => ({
   dispatchauth: () => { dispatch(fetchToken()); },
   dispatchexam: () => { dispatch(fetchExam()); },
   dispatchquestion: (id, choice) => { dispatch(updateExam(id, choice)); },
+  dispatchBeginExam: () => { dispatch(beginExam()); },
+  dispatchEndExam: () => { dispatch(endExam()); },
+  dispatchSubmitExam: (payload, answers) => { dispatch(submitExam(payload, answers)); },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ExamBox);

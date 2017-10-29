@@ -10,10 +10,12 @@ const Intro = props => (
     </p>
 
     <p>Keep in mind <b>ALL</b> examinations are <u>open book</u>.  Please take
-  your time completing this exam.
+      your time completing this exam.
     </p>
     <p>Good luck!  And may the odds be ever in your favor.</p>
-    <Segment className="right aligned" basic><Button color="blue" onClick={props.nextFunc}>Test</Button></Segment>
+    <Segment className="right aligned" basic>
+      <Button color="blue" onClick={props.nextFunc}>Test</Button>
+    </Segment>
   </div>
 );
 

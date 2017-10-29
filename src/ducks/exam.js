@@ -9,6 +9,8 @@ export const BEGIN_EXAM = 'BEGIN_EXAM';
 export const END_EXAM = 'END_EXAM';
 export const UPDATE_EXAM = 'UPDATE_EXAM';
 export const POSITION_EXAM = 'POSITION_EXAM';
+export const SEND_RESULTS_EXAM = 'SEND_RESULTS_EXAM';
+export const RECEIVE_RESULTS_EXAM = 'RECEIVE_RESULTS_EXAM';
 
 export const requestExam = () => (
   { type: REQUEST_EXAM }
@@ -18,8 +20,8 @@ export const receiveExam = json => (
   { type: RECEIVE_EXAM, exam: json }
 );
 
-export const errorExam = e => (
-  { type: ERROR_EXAM, message: e }
+export const errorExam = json => (
+  { type: ERROR_EXAM, message: json.getIn(['msg']) }
 );
 
 export const beginExam = () => (
@@ -34,18 +36,43 @@ export const updateExam = (id, choice) => (
   { type: UPDATE_EXAM, id, choice }
 );
 
+export const sendResultsExam = () => (
+  { type: SEND_RESULTS_EXAM }
+);
+
+export const receiveResultsExam = () => (
+  { type: RECEIVE_RESULTS_EXAM }
+);
+
 export const fetchExam = () =>
   (dispatch) => {
     dispatch(requestExam());
     return fetch(`${apiurl}/v2/exam/request`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } })
       .then((response) => {
+        const json = response.json();
         if (response.status !== 200) {
-          throw Error(response.statusText);
+          return json.then(Promise.reject.bind(Promise));
         }
-        return response.json();
+        return json;
       })
       .then(json => dispatch(receiveExam(Immutable.fromJS(json))))
-      .catch(e => dispatch(errorExam(Immutable.fromJS(e))));
+      .catch(response => dispatch(errorExam(Immutable.fromJS(response))));
+  };
+
+export const submitExam = (payload, answers) =>
+  (dispatch) => {
+    dispatch(sendResultsExam());
+
+    return fetch(`${apiurl}/v2/exam/submit`, {
+      method: 'POST',
+      body: `payload=${payload}&answers=${btoa(answers)}`,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      },
+    })
+      .then(response => response.json())
+      .then(json => dispatch(receiveResultsExam(Immutable.fromJS(json))));
   };
 
 export default function exam(state = Immutable.fromJS({
@@ -56,6 +83,7 @@ export default function exam(state = Immutable.fromJS({
   hasErrored: false,
   inProgress: false,
   answers: {},
+  isComplete: -1,
 }), action) {
   switch (action.type) {
     case REQUEST_EXAM: {
@@ -79,12 +107,21 @@ export default function exam(state = Immutable.fromJS({
     case BEGIN_EXAM: {
       return state.setIn(['inProgress'], true);
     }
-    case END_EXAM: {
-      return state.setIn(['inProgress'], false);
-    }
     case UPDATE_EXAM: {
       // This will add/modify based on given id
       return state.setIn(['answers', action.id], action.choice);
+    }
+    case END_EXAM: {
+      const newState = state.setIn(['isComplete'], 0);
+      return newState.setIn(['inProgress'], false);
+    }
+    case SEND_RESULTS_EXAM: {
+      return state.setIn(['isComplete'], 1);
+    }
+    case RECEIVE_RESULTS_EXAM: {
+      let newState = state.setIn(['exam'], '');
+      newState = state.setIn(['payload'], action.results);
+      return newState.setIn(['isComplete'], 2);
     }
     default: {
       return state;

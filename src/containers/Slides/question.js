@@ -13,17 +13,15 @@ class Question extends React.Component {
   render() {
     let options;
     if (this.props.question.type === 0) {
-      this.props.question.order = JSON.parse(this.props.question.order);
-      options = [this.props.question.order].map(v => (
-        <Form.Radio
-          key={v}
-          label={this.props.question[v]}
-          value={v}
-          onChange={this.props.handleChange}
-          checked={this.props.valueState === v}
-        />));
+      // this.props.question.order = JSON.parse(this.props.question.order);
+      options = this.props.question.order.map(v => (<Form.Radio
+        key={v}
+        label={this.props.question[v]}
+        value={v}
+        onChange={this.props.handleChange}
+        checked={this.props.valueState === v}
+      />));
     }
-    console.dir(options);
     return (
       <div>
         <Header as="h3">
@@ -60,7 +58,7 @@ class Question extends React.Component {
           </Grid.Column>
           <Grid.Column width="8" className="right aligned">
             <Button color="blue" onClick={this.props.nextFunc}>
-              Next <Icon name="right arrow" />
+              {(this.props.last) ? 'Finish' : 'Next'} <Icon name="right arrow" />
             </Button>
           </Grid.Column>
         </Grid>
