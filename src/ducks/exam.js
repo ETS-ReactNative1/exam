@@ -40,8 +40,8 @@ export const sendResultsExam = () => (
   { type: SEND_RESULTS_EXAM }
 );
 
-export const receiveResultsExam = () => (
-  { type: RECEIVE_RESULTS_EXAM }
+export const receiveResultsExam = json => (
+  { type: RECEIVE_RESULTS_EXAM, json }
 );
 
 export const fetchExam = () =>
@@ -120,7 +120,7 @@ export default function exam(state = Immutable.fromJS({
     }
     case RECEIVE_RESULTS_EXAM: {
       let newState = state.setIn(['exam'], '');
-      newState = state.setIn(['payload'], action.results);
+      newState = state.setIn(['payload'], action.json);
       return newState.setIn(['isComplete'], 2);
     }
     default: {

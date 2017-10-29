@@ -126,7 +126,21 @@ class ExamBox extends Component {
       return (<div>Submitting exam... Please wait.</div>);
     }
     if (this.props.exam.getIn(['isComplete']) === 2) {
-      return (<div>Done.</div>);
+      if (this.props.exam.getIn(['payload', 'status']) !== undefined) {
+        return (
+          <Message negative>
+            <Message.Header><Icon name="warning sign" /> Exam Submission Error</Message.Header>
+            <p>There was an error submitting the examination to the VATUSA API.</p>
+            <p>The message we got was <b>{this.props.exam.getIn(['payload', 'msg'])}</b>
+            </p>
+          </Message>);
+      }
+      return (
+        <div>
+          <p>Done, your exam has been graded.</p>
+          <p>The result of your exam is: <b>{this.props.exam.getIn(['payload', 'results'])}</b></p>
+          <p><a href="https://www.vatusa.net/exam/0">Return to VATUSA</a></p>
+        </div>);
     }
     return (<div>Unknown location!!!</div>);
   }
