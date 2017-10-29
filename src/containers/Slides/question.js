@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Form, Grid, Icon, Header } from 'semantic-ui-react';
-import SanitizedHTML from 'react-sanitized-html';
+import ReactHtmlParser from 'react-html-parser';
 
 class Question extends React.Component {
   static shuffle(l) {
@@ -14,23 +14,19 @@ class Question extends React.Component {
   render() {
     let options;
     if (this.props.question.type === 0) {
-      // this.props.question.order = JSON.parse(this.props.question.order);
-      options = this.props.question.order.map(v => (<Form.Radio
-        key={v}
-        label={this.props.question[v]}
-        value={v}
-        onChange={this.props.handleChange}
-        checked={this.props.valueState === v}
-      />));
+      options = this.props.question.order.map(v => (
+        <Form.Radio
+          key={v}
+          label={this.props.question[v]}
+          value={v}
+          onChange={this.props.handleChange}
+          checked={this.props.valueState === v}
+        />));
     }
     return (
       <div>
         <Header as="h3" >
-          {this.props.position + 1}.
-          <SanitizedHTML
-            allowedTags={['a', 'img', 'br', 'p', 'b', 'u', 'i']}
-            html={this.props.question.question}
-          />
+          {this.props.position + 1}. {ReactHtmlParser(this.props.question.question)}
         </Header>
         <Form>
           { this.props.question.type === 0 &&
