@@ -2,7 +2,28 @@ import React from 'react';
 import { Button, Form, Grid, Icon, Header } from 'semantic-ui-react';
 
 class Question extends React.Component {
+  static shuffle(l) {
+    const a = l;
+    for (let i = a.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
   render() {
+    let options;
+    if (this.props.question.type === 0) {
+      this.props.question.order = JSON.parse(this.props.question.order);
+      options = [this.props.question.order].map(v => (
+        <Form.Radio
+          key={v}
+          label={this.props.question[v]}
+          value={v}
+          onChange={this.props.handleChange}
+          checked={this.props.valueState === v}
+        />));
+    }
+    console.dir(options);
     return (
       <div>
         <Header as="h3">
@@ -10,32 +31,7 @@ class Question extends React.Component {
         </Header>
         <Form>
           { this.props.question.type === 0 &&
-            <Form.Group grouped>
-              <Form.Radio
-                label={this.props.question.one}
-                value="one"
-                onChange={this.props.handleChange}
-                checked={this.props.valueState === 'one'}
-              />
-              <Form.Radio
-                label={this.props.question.two}
-                value="two"
-                onChange={this.props.handleChange}
-                checked={this.props.valueState === 'two'}
-              />
-              <Form.Radio
-                label={this.props.question.three}
-                value="three"
-                onChange={this.props.handleChange}
-                checked={this.props.valueState === 'three'}
-              />
-              <Form.Radio
-                label={this.props.question.four}
-                value="four"
-                onChange={this.props.handleChange}
-                checked={this.props.valueState === 'four'}
-              />
-            </Form.Group>
+            options
           }
           { this.props.question.type === 1 &&
             <Form.Group grouped>
@@ -47,9 +43,9 @@ class Question extends React.Component {
               />
               <Form.Radio
                 label="False"
-                value={this.props.question.one === 'True' ? 'one' : 'two'}
+                value={this.props.question.one === 'False' ? 'one' : 'two'}
                 onChange={this.props.handleChange}
-                checked={this.props.valueState === (this.props.question.one === 'True' ? 'one' : 'two')}
+                checked={this.props.valueState === (this.props.question.one === 'False' ? 'one' : 'two')}
               />
             </Form.Group>
           }

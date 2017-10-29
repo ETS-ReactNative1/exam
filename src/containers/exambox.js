@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Icon, Button, Message } from 'semantic-ui-react';
+import { Icon, Button, Header, Message } from 'semantic-ui-react';
 
 import { fetchToken } from '../ducks/auth';
 import { fetchExam, updateExam } from '../ducks/exam';
@@ -98,14 +98,17 @@ class ExamBox extends Component {
       return (<Intro nextFunc={this.nextFunc} />);
     }
     return (
-      <Question
-        position={this.position}
-        question={this.question}
-        handleChange={this.handleChange}
-        valueState={this.state.value}
-        nextFunc={this.nextFunc}
-        prevFunc={this.prevFunc}
-      />
+      <div>
+        <Header as="h1" color="blue">{this.props.exam.getIn(['exam']).name}</Header>
+        <Question
+          position={this.position}
+          question={this.question}
+          handleChange={this.handleChange}
+          valueState={this.state.value}
+          nextFunc={this.nextFunc}
+          prevFunc={this.prevFunc}
+        />
+      </div>
     );
   }
 }
