@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, Form, Grid, Icon, Header } from 'semantic-ui-react';
+import SanitizedHTML from 'react-sanitized-html';
 
 class Question extends React.Component {
   static shuffle(l) {
@@ -24,8 +25,12 @@ class Question extends React.Component {
     }
     return (
       <div>
-        <Header as="h3">
-          {this.props.position + 1}. {this.props.question.question}
+        <Header as="h3" >
+          {this.props.position + 1}.
+          <SanitizedHTML
+            allowedTags={['a', 'img', 'br', 'p', 'b', 'u', 'i']}
+            html={this.props.question.question}
+          />
         </Header>
         <Form>
           { this.props.question.type === 0 &&
