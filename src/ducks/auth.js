@@ -28,8 +28,8 @@ export const fetchToken = () =>
         }
         return response.json();
       })
-      .then(json => dispatch(receiveToken(Immutable.fromJS(json))))
-      .catch(e => dispatch(errorToken(Immutable.fromJS(e))));
+      .then(json => dispatch(receiveToken(Immutable.fromJS(json.data))))
+      .catch(e => dispatch(errorToken(Immutable.fromJS(e.data))));
   };
 
 export default function token(state = Immutable.fromJS({

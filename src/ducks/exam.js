@@ -55,8 +55,8 @@ export const fetchExam = () =>
         }
         return json;
       })
-      .then(json => dispatch(receiveExam(Immutable.fromJS(json))))
-      .catch(response => dispatch(errorExam(Immutable.fromJS(response))));
+      .then(json => dispatch(receiveExam(Immutable.fromJS(json.data))))
+      .catch(response => dispatch(errorExam(Immutable.fromJS(response.data))));
   };
 
 export const submitExam = (payload, answers) =>
@@ -72,7 +72,7 @@ export const submitExam = (payload, answers) =>
       },
     })
       .then(response => response.json())
-      .then(json => dispatch(receiveResultsExam(Immutable.fromJS(json))));
+      .then(json => dispatch(receiveResultsExam(Immutable.fromJS(json.data))));
   };
 
 export default function exam(state = Immutable.fromJS({
