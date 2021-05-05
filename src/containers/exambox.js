@@ -157,7 +157,7 @@ class ExamBox extends Component {
         <p>Your exam has been graded.</p>
         <p>The result of your exam is: <strong>{this.props.exam.getIn(['payload', 'results'])}</strong></p>
         <p><a href="https://www.vatusa.net/exam/">Return to VATUSA</a></p>
-      </div);
+      </div>);
     }
     return (<div>Unknown location!!!</div>);
   }
