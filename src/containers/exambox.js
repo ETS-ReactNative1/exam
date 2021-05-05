@@ -135,7 +135,7 @@ class ExamBox extends Component {
             </p>
           </Message>);
       }
-      if(this.props.exam.getIn(['exam']).id == 7)) {
+      if(this.props.exam.getIn(['exam']).id == 7) {
         if(this.props.exam.getIn(['payload', 'results']) === "Passed.") {
           return (
             <div>
