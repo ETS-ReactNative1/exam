@@ -135,12 +135,29 @@ class ExamBox extends Component {
             </p>
           </Message>);
       }
-      return (
+      if(this.props.exam.getIn(['exam']).id == 7)) {
+        if(this.props.exam.getIn(['payload', 'results']) === "Passed.") {
+          return (
+            <div>
+              <p>You have <strong>passed</strong> your exam. Congratulations! Please select one of the following links:</p>
+              <p>If you are a <strong>new</strong> controller, select your facility <a href="https://www.vatusa.net/my/select">here</a>.</p>
+              <p>If you are a <strong>returning</strong> controller and were previously part of a facility, transfer to your facility of choice <a href="https://www.vatusa.net/my/transfer">here</a>.</p>
+              <p><a href="https://www.vatusa.net/exam/">Return to VATUSA</a></p>
+            </div>);
+        }
+        return (
         <div>
-          <p>Done, your exam has been graded.</p>
-          <p>The result of your exam is: <b>{this.props.exam.getIn(['payload', 'results'])}</b></p>
-          <p><a href="https://www.vatusa.net/exam/0">Return to VATUSA</a></p>
+          <p>Your exam has been graded.</p>
+          <p>You <strong>did not pass</strong> your exam. You must pass in order to select a facility. Your exam will be automatically reassigned in 3 days.</p>
+          <p><a href="https://www.vatusa.net/exam/">Return to VATUSA</a></p>
         </div>);
+        }     
+      return (
+      <div>
+        <p>Your exam has been graded.</p>
+        <p>The result of your exam is: <strong>{this.props.exam.getIn(['payload', 'results'])}</strong></p>
+        <p><a href="https://www.vatusa.net/exam/">Return to VATUSA</a></p>
+      </div);
     }
     return (<div>Unknown location!!!</div>);
   }
